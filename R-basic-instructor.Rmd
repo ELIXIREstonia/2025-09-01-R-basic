@@ -189,28 +189,66 @@ You have been given data about students from three different classes: Biology, C
 
 ```{r}
 # 1. Vectors for Biology class
+bio_names <- c("Anna", "Mike", "Luis")
+bio_ages <- c(20, 21, 19)
+bio_scores <- c(85, 78, 90)
+print("Biology vectors:")
+print(bio_names)
+print(bio_ages)
+print(bio_scores)
 ```
 
 ```{r}
 # 2. Matrix of ages and scores
+all_ages <- c(20, 21, 19, 22, 20, 23, 24, 22, 25)
+all_scores <- c(85, 78, 90, 88, 76, 95, 87, 80, 92)
+student_matrix <- matrix(c(all_ages, all_scores), ncol = 2, dimnames = list(NULL, c("Age", "Score")))
+print("Student matrix:")
+print(student_matrix)
 ```
 
 ```{r}
 # 3. Data frame of all students
+all_names <- c("Anna", "Mike", "Luis", "Sam", "Ella", "Ravi", "Mia", "Jack", "Olivia")
+all_classes <- c("Biology", "Biology", "Biology", "Chemistry", "Chemistry", "Chemistry", "Physics", "Physics", "Physics")
+student_df <- data.frame(
+  name = all_names,
+  age = all_ages,
+  score = all_scores,
+  class = all_classes
+)
+print(student_df)
 ```
 
 ```{r}
 # 4. List for Anna
+anna_list <- list(
+  name = "Anna",
+  age = 20,
+  score = 85,
+  class = "Biology"
+)
+print("List for Anna:")
+print(anna_list)
 
 ```
 
 ```{r}
 # 5. Analysis
 # - Students with scores > 85
+high_scores <- student_df[student_df$score > 85, ]
+print(high_scores[, c("name", "class")])
 ```
 
 ```{r}
 # - Average score per class from the matrix
+avg_score_bio <- mean(student_matrix[all_classes == "Biology", "Score"])
+avg_score_chem <- mean(student_matrix[ all_classes == "Chemistry", "Score"])
+avg_score_physics <- mean(student_matrix[all_classes == "Physics", "Score"])
+print("Average scores per class (from matrix):")
+print(paste("Biology:", avg_score_bio))
+print(paste("Chemistry:", avg_score_chem))
+print(paste("Physics:", avg_score_physics))
 ```
 
 ## Loading the Tidyverse
@@ -291,7 +329,6 @@ Find `Help` panel from the right hand side and search `read_tsv` function. How m
 
 Tidyverse pipes, represented by the `%>%` \<ctrl+shift+M\> symbol, allow you to chain together multiple functions in a clear and readable manner. Pipes take the output of one function and use it as the input for the next function, making it easy to follow the sequence of data transformations.
 
-
 ```{r include=FALSE}
 # Create a dummy dataset
 set.seed(42)
@@ -368,6 +405,7 @@ data %>%
 ```
 
 #### `group_by()` and `summarize()` - Working with grouped data
+
 In the following example, we'll use pipes to perform a series of operations on our dataset: 1. Group the data by a specific category (`group_by`) 2. Calculate summary statistics for each group (`summarize`) 3. Sort the resulting summary by a specific statistic (`arrange`)
 
 The `group_by()` function is used to group a data frame by one or more variables. When you group a data frame, any subsequent operations you perform will be done on a per-group basis. This is incredibly powerful when combined with `summarize()`.
@@ -515,7 +553,63 @@ Using the "Memory Test on Drugged Islanders Data" dataset, your task is to analy
     Find more options from [data-wrangling-cheatsheet](https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf)
 
 ```{r}
+Isd <- read_csv('data/Islander_data.csv')
 
+# 1. Data Exploration
+
+# Display the first 10 rows of the dataset.
+print("First 10 rows:")
+head(Isd, 10)
+
+# Calculate the overall average of memory scores before and after the drug was administered.
+print("Overall average scores:")
+Isd %>% 
+  summarise(
+    avg_before = mean(Mem_Score_Before),
+    avg_after = mean(Mem_Score_After)
+  )
+
+# 2. Drug Analysis
+print("Drug analysis:")
+Isd %>% 
+  group_by(Drug) %>%
+  summarise(
+    avg_diff = mean(Diff),
+    n = n()
+  ) %>%
+  arrange(desc(avg_diff))
+
+# 3. Dosage Analysis
+print("Dosage analysis:")
+Isd %>%
+  group_by(Drug, Dosage) %>%
+  summarise(
+    avg_diff = mean(Diff)
+  ) %>%
+  arrange(Drug, desc(avg_diff))
+
+# 4. Age Group Analysis
+print("Age group analysis:")
+Isd %>%
+  mutate(
+    age_group = case_when(
+      age < 30 ~ "Young",
+      age >= 30 & age <= 50 ~ "Middle-aged",
+      TRUE ~ "Senior"
+    )
+  ) %>%
+  group_by(age_group, Drug) %>%
+  summarise(
+    avg_diff = mean(Diff)
+  )
+
+# 5. Happy/Sad Group Analysis
+print("Happy/Sad group analysis:")
+Isd %>%
+  group_by(`Happy_Sad_group`) %>%
+  summarise(
+    avg_diff = mean(Diff)
+  )
 ```
 
 # About the data

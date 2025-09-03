@@ -11,3 +11,6 @@ Here we keep the ideas for future development based on the feedback of helpers, 
 - if/else conditions
 - iterators (for, foreach, while etc.)
 - functions
+
+## Reminders
+- Make sure to note that it is possible to run the whole code snippet by clicking the green "play" button. Fixes the problem of failing executions because earlier code lines have not been run.
